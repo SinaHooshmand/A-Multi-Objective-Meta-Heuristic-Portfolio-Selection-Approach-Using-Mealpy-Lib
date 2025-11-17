@@ -1,0 +1,169 @@
+This repository implements a meta-heuristic portfolio selection model using the MEALPy optimization library, combined with Optuna for hyperparameter tuning.
+The model optimizes a portfolio matrix using PSO (Particle Swarm Optimization) while respecting structural constraints and minimizing a multi-objective fitness vector.
+
+The approach is tailored for portfolio structures with triangular/irregular allocation masks, and supports complex feasibility rules on both decision matrices.
+
+🚀 Main Features
+✔ Multi-Objective Portfolio Optimization
+
+The portfolio is evaluated using five separate criteria:
+
+R – returns
+
+NPV – net present value
+
+V – value
+
+PIR – portfolio interaction risk
+
+Z – combined weighted score
+
+The solver minimizes a vector of:
+[-R, -NPV, -V, PIR, Z]
+
+✔ Hybrid Decision Variables
+
+The model works with two decision matrices:
+
+xᵢⱼ → continuous values (0–10)
+
+nᵢⱼ → binary-like continuous values (0–1)
+
+Both follow shape constraints defined by a mask matrix.
+
+✔ Advanced Constraint System
+
+Feasibility checks include:
+
+Minimum return requirement
+
+One chosen item per row
+
+Portfolio cardinality bounds
+
+Logical relationship between xᵢⱼ and nᵢⱼ
+
+Bounding rules
+
+Budget constraints
+
+Capacity requirements
+
+✔ Optuna-Driven PSO Hyperparameter Tuning
+
+Optuna searches for the best:
+
+number of epochs
+
+population size
+
+PSO coefficients: c1, c2
+
+inertia strategy parameter alpha
+
+The best hyperparameters are then used to run a final optimized PSO simulation.
+
+✔ Optuna Dashboard
+
+The project includes an interactive dashboard:
+
+http://127.0.0.1:8080/
+
+
+Command launched automatically using:
+
+run_server(storage="sqlite:///optuna_study.db")
+
+📁 Project Structure
+.
+├── main.py                  # Main PSO + Optuna execution script (your code)
+├── Parameters.py            # Parameters and configuration file
+├── optuna_study.db          # Saved Optuna history
+├── README.md                # This document
+└── requirements.txt         # Dependencies
+
+🧠 How the Model Works
+1️⃣ Portfolio Class
+
+Contains:
+
+Matrix initialization
+
+Objective calculations
+
+Feasibility checks
+
+Portfolio scoring
+
+2️⃣ MEALPy Problem Definition
+
+The model uses the AIW-PSO variant from MEALPy:
+
+PSO.AIW_PSO(epoch=..., pop_size=..., c1=..., c2=..., alpha=...)
+
+3️⃣ Optuna Optimization Loop
+
+Every Optuna trial runs a PSO search and returns a scalar:
+
+return sum(g_best.target.objectives)
+
+4️⃣ Final PSO Run
+
+After tuning, the best parameters are extracted and used to run a final MOPSO.
+
+5️⃣ Post-Processing
+
+Thresholding logic:
+
+nᵢⱼ values are cleaned (0, 1, or masked)
+
+xᵢⱼ is filtered using nᵢⱼ mask
+
+Row sums and totals printed for interpretation
+
+📦 Installation
+pip install numpy pandas mealpy optuna optuna-dashboard
+
+▶️ Running the Model
+
+Simply run:
+
+python main.py
+
+
+This will:
+
+Run Optuna
+
+Print best hyperparameters
+
+Execute final PSO
+
+Print best xᵢⱼ and nᵢⱼ matrices
+
+Launch Optuna dashboard
+
+📈 Example Outputs
+
+Best hyperparameters
+
+Best fitness vector
+
+Thresholded decision matrices
+
+Portfolio totals
+
+🛠️ Dependencies
+numpy
+pandas
+mealpy
+optuna
+optuna-dashboard
+
+📝 Notes
+
+Constraint violations can be penalized by uncommenting the penalty in multi_objective_function.
+
+Masking logic ensures triangular portfolio consistency.
+
+Solutions are multi-objective; PSO minimizes all simultaneously.

@@ -1,0 +1,5 @@
+Pandas
+numpy
+mealpy
+optuna
+optuna-dashboard
